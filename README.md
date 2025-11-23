@@ -72,10 +72,11 @@ bh, ah = torch.from_numpy(bh).to(device), torch.from_numpy(ah).to(device)
 
 ## Usage
 ### 1. 模型下載與放置方式
-請至本專案的 [Releases 頁面](https://github.com/wenting2110/ml-rvc-inference/releases) 下載下列兩個檔案：
+請至本專案的 [Releases 頁面](https://github.com/wenting2110/ml-rvc-inference/releases) 下載下列三個檔案：
 
 - `Teacher_infer.pth`：模型權重
 - `Teacher_infer.index`：聲音索引
+- `docs_audio_obama.wav`：待轉換的輸入音檔
 
 下載後請將檔案放置於以下資料夾：
 ```perl
@@ -88,7 +89,7 @@ rvc_inference/
 ├── index/                   # 儲存 .index 索引檔
 │   └── Teacher_infer.index
 ├── input/                   # 放待轉換的輸入音檔（.wav）
-│   └── sample.wav
+│   └── docs_audio_obama.wav
 ├── Teacher_infer.wav        # 推論後的音檔（.wav）
 ├── requirements.txt         # Python 套件需求
 └── README.md
