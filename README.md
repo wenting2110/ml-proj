@@ -80,7 +80,7 @@ bh, ah = torch.from_numpy(bh).to(device), torch.from_numpy(ah).to(device)
 下載後請將檔案放置於以下資料夾：
 ```perl
 rvc_inference/
-├── infer_CPU.py             # 主推論腳本
+├── inference.py             # 主推論腳本
 ├── package.py               # 將 WebUI 模型轉換為 infer 專用格式
 ├── index.py                 # 訓練 index (.index)
 ├── model/                   # 儲存 .pth 模型檔
@@ -95,10 +95,10 @@ rvc_inference/
 ```
 
 
-### 2. 執行推論程式碼 `infer_CPU.py`
+### 2. 執行推論程式碼 `inference.py`
 ```bash
 cd rvc_inference
-python infer_CPU.py
+python inference.py
 ```
 
 
@@ -108,7 +108,7 @@ rvc_inference/Teacher_infer.wav
 ```
 ---
 
-### 4. Optimization：修改 `infer_CPU.py` 中的 `f0_up_key` value
+### 4. Optimization：修改 `inference.py` 中的 `f0_up_key` value
 `f0_up_key` 是 RVC 推論時控制音高（pitch）的參數，用來設定「**將輸入聲音升高或降低幾個音階**」，影響轉換出來的聲音是否像目標聲音。
 
 
