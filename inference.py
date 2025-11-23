@@ -3,24 +3,28 @@ from inferrvc import RVC, load_torchaudio
 import soundfile as sf
 import torch
 import fairseq.data.dictionary
-#import torch.serialization
 
 # 允許 fairseq Dictionary 被安全載入
 torch.serialization.add_safe_globals([fairseq.data.dictionary.Dictionary])
 
 
 # 強制關閉 CUDA
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-torch.cuda.is_available = lambda: False
-torch._C._cuda_isDriverSufficient = lambda: False
-print("Using CPU mode only. CUDA disabled.")
+#os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+#torch.cuda.is_available = lambda: False
+#torch._C._cuda_isDriverSufficient = lambda: False
+
+if torch.cuda.is_available():
+    device = "cuda"
+    print("Using GPU:", torch.cuda.get_device_name(0))
+else:
+    device = "cpu"
+    print("Using CPU only.")
+
 
 # 設定模型與索引的資料夾
 base_dir = os.path.dirname(os.path.abspath(__file__))
 os.environ['RVC_MODELDIR'] = os.path.join(base_dir, 'model')
 os.environ['RVC_INDEXDIR'] = os.path.join(base_dir, 'index')
-#os.environ['RVC_MODELDIR'] = r"C:\Users\user\Desktop\ML_proj\RVC Inference\model"
-#os.environ['RVC_INDEXDIR'] = r"C:\Users\user\Desktop\ML_proj\RVC Inference\index"
 
 # the audio output frequency, default is 44100.
 os.environ['RVC_OUTPUTFREQ'] = '44100'
