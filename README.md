@@ -19,6 +19,11 @@ CPU 版本：
 pip install torch==2.9.0+cpu torchaudio==2.9.0+cpu torchvision==0.24.0+cpu --index-url https://download.pytorch.org/whl/cpu
 ```
 
+GPU 版本：
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
+
 ### 3. 安裝 Microsoft Visual C++ Build Tools（C++ 編譯器）
 `fairseq` 安裝時需要編譯 C++ 模組，**Windows 用戶必須安裝 C++ 編譯器**。
 
