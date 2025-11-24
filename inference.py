@@ -3,6 +3,10 @@ from inferrvc import RVC, load_torchaudio
 import soundfile as sf
 import torch
 import fairseq.data.dictionary
+import time
+
+# 計算推論時間
+start = time.time()
 
 # 允許 fairseq Dictionary 被安全載入
 torch.serialization.add_safe_globals([fairseq.data.dictionary.Dictionary])
@@ -40,7 +44,7 @@ print('Paths', model.model_path, model.index_path)
 
 
 # 讀取要轉換的音檔
-input_audio_path = os.path.join(base_dir, "input", "docs_audio_obama.wav")
+input_audio_path = os.path.join(base_dir, "input", "input.wav")
 audio, sr = load_torchaudio(input_audio_path)
 
 # 語音轉換
@@ -55,3 +59,6 @@ converted = model(
 # 輸出轉換後的音訊
 sf.write("Teacher_infer.wav", converted, 44100)
 print("Done!")
+
+end = time.time()
+print(f"Total inference time: {end - start:.2f} seconds")

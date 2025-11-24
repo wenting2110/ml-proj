@@ -1,12 +1,12 @@
 # RVC Inference
-使用 RVC（Retrieval-based Voice Conversion）模型進行語音轉換，支援 CPU 或 GPU 執行環境。  
-可將一段原始語音轉換為指定目標聲音。
+使用 RVC（Retrieval-based Voice Conversion）模型進行語音轉換，支援 CPU / GPU 推論。  
+可將一段原始語音轉換成指定目標聲音。
 
 ---
 
 ## Installation
-在 Windows 上安裝透過 GitHub 安裝 fairseq，過程中需要建立 symbolic link 或複製某些目錄，預設權限不足會導致安裝失敗。  
-因此請使用「系統管理員身分」啟動你的終端機工具。
+在 Windows 安裝 `fairseq` 需要編譯 C++，若未使用系統管理員身分啟動終端機可能會安裝失敗。
+因此建議全程使用 「系統管理員身分」啟動 CMD / PowerShell。
 ### 1. 建立 Conda 環境並安裝 PyTorch (CPU 版本)
 ```bash
 conda create -n rvcinfer python=3.10
@@ -19,7 +19,7 @@ CPU 版本：
 pip install torch==2.9.0+cpu torchaudio==2.9.0+cpu torchvision==0.24.0+cpu --index-url https://download.pytorch.org/whl/cpu
 ```
 
-GPU 版本：
+GPU 版本 (CUDA 11.8)：
 ```bash
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 ```
@@ -49,7 +49,8 @@ pip install -r requirements.txt
 * inferrvc 套件（.whl 格式）
 
 
-### 5. 修改 inferrvc 原始碼（讓 CPU 模式正常運作）
+### 5. 修改 inferrvc 原始碼
+1. 讓 CPU 模式正常運作：
 如果你想在沒有 NVIDIA GPU 的電腦上使用 RVC 推論，請依下列方式修改 inferrvc 原始碼，讓其正確使用 CPU：
 
 * 開啟下列檔案：
@@ -68,6 +69,24 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 bh, ah = torch.from_numpy(bh).to(device), torch.from_numpy(ah).to(device)
 ```
 
+2. 讓 GPU 模式正常運作：
+torchaudio resample 不支援 FP16，會產生：
+```bash
+RuntimeError: Input type (torch.cuda.HalfTensor) and weight type (torch.cuda.FloatTensor) should be the same
+```
+解法：強制使用 FP32 推論
+
+* 開啟下列檔案：
+```bash
+<你的 Conda 環境路徑>\Lib\site-packages\inferrvc\configs\config.py
+```
+
+* 找到所有 `self.is_half = True` ，修改成：
+```bash
+self.is_half = False
+```
+讓 RVC 在 GPU & CPU 都使用 FP32 推論。
+
 ---
 
 ## Usage
@@ -76,7 +95,7 @@ bh, ah = torch.from_numpy(bh).to(device), torch.from_numpy(ah).to(device)
 
 - `Teacher_infer.pth`：模型權重
 - `Teacher_infer.index`：聲音索引
-- `docs_audio_obama.wav`：待轉換的輸入音檔
+- `input.wav`：測試音檔
 
 下載後請將檔案放置於以下資料夾：
 ```perl
@@ -89,8 +108,7 @@ rvc_inference/
 ├── index/                   # 儲存 .index 索引檔
 │   └── Teacher_infer.index
 ├── input/                   # 放待轉換的輸入音檔（.wav）
-│   └── docs_audio_obama.wav
-├── Teacher_infer.wav        # 推論後的音檔（.wav）
+│   └── input.wav
 ├── requirements.txt         # Python 套件需求
 └── README.md
 ```
@@ -109,7 +127,9 @@ rvc_inference/Teacher_infer.wav
 ```
 ---
 
-### 4. Optimization：修改 `inference.py` 中的 `f0_up_key` value
+## Others
+
+### 修改 `inference.py` 中的 `f0_up_key` value
 `f0_up_key` 是 RVC 推論時控制音高（pitch）的參數，用來設定「**將輸入聲音升高或降低幾個音階**」，影響轉換出來的聲音是否像目標聲音。
 
 
@@ -132,6 +152,13 @@ rvc_inference/Teacher_infer.wav
 | 女聲 → 另一種女聲（偏低） | `-2 ~ -5` |
 | 原始音高已很接近目標聲音 | `0` |
 
+
+### CPU 與 GPU 時間差 (30 秒 input.wav)
+
+| 裝置                        | 推論時間          |
+| ------------------------- | ------------- |
+| **GPU：RTX 3080**          | **8.88 sec**  |
+| **CPU：AMD Ryzen 7 3700X** | **30.69 sec** |
 
 ---
 
